@@ -36,4 +36,4 @@ void freeEdgeNode(edgenode*);
 Graph* loadGraph(char*);
 */
 
-#endif
+#endif // GRAPH_H
