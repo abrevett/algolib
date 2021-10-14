@@ -5,6 +5,14 @@ void balanceTree(Tree*);
 int getBalanceTree(Tree*);
 int heightMax(long long unsigned, long long unsigned);
 
+
+// TODO: Make this function a general Tree node creator
+/**
+ * initTree:
+ *  Creates a new Tree object. Since a non-null tree simplifies
+ * the initialization and reduces the number of typedefs, it is
+ * a better interface in general.
+ */
 void initTree( Tree** root, void* initData){
     // Initialize the tree's root node
     Tree* node = malloc( sizeof(Tree) );
@@ -14,6 +22,14 @@ void initTree( Tree** root, void* initData){
     node->data = initData;
 }
 
+/**
+ * freeTree:
+ *  Frees the heap memory of the entire tree postorder.
+ *
+ * Args:
+ *  Tree* tree: the tree that needs to be destroyed
+ *  void dealloc(void*): A function used to free generic pointer object
+ */
 void freeTree(Tree* tree, void (*dealloc)(void* obj) ){
     if(!tree) return;
     freeTree( tree->left, dealloc );
@@ -23,19 +39,31 @@ void freeTree(Tree* tree, void (*dealloc)(void* obj) ){
     free(tree);
 }
 
+/**
+ * addNodeTree:
+ *  Adds a leaf node to another tree. DO NOT USE FOR MERGING TREES
+ *
+ * Args:
+ *  Tree* root: The tree to add a node to
+ *  Tree* node: The node to append
+ *  int compare(Tree*, Tree*)
+ */
 void addNodeTree(Tree* root, Tree* node, int (*compare)(Tree* a, Tree* b) ){
     int cmp = compare(node, root);
+    long long unsigned height = root->height
     if(cmp < 0)
 	if(height) addNodeTree( root->left, node, compare );
 	else{
 	    root->left = node;
 	    node->parent = root;
+	    // TODO: Add rotation bubble up here
 	}
     else if(cmp > 0)
 	if(height) addNodeTree( root->right, node, compare );
 	else{
 	    root->right = node;
 	    node->parent = root;
+	    // TODO: Add rotation bubble up here
 	}
     else{
 	freeTree(node);
@@ -46,9 +74,41 @@ void addNodeTree(Tree* root, Tree* node, int (*compare)(Tree* a, Tree* b) ){
     balanceTree(root);
 }
 
-/**
- * Helper functions
- */
+/*************************************************************
+
+		    Mapping Functions
+
+*************************************************************/
+
+void mapPreTree( Tree* tree, void (*mapf)(Tree* node) ){
+    if(!tree) return;
+
+    mapf(tree);
+    mapPreTree(tree->left, mapf);
+    mapPreTree(tree->right, mapf);
+}
+
+void mapInTree( Tree* tree, void (*mapf)(Tree* node) ){
+    if(!tree) return;
+
+    mapInTree(tree->left, mapf);
+    mapf(tree);
+    mapInTree(tree->right, mapf);
+}
+
+void mapPostTree( Tree* tree, void (*mapf)(Tree* node) ){
+    if(!tree) return;
+
+    mapPostTree(tree->left, mapf);
+    mapPostTree(tree->right, mapf);
+    mapf(tree);
+}
+
+/*************************************************************
+ 
+		    Helper Functions
+
+*************************************************************/
 
 int heightMax(long long unsigned h1, long long unsigned h2){
     return (h1 < h2) ? h2 : h1;
